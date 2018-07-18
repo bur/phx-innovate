@@ -1,7 +1,7 @@
 {
-  "name": "DecisionTree",
+  "name": "PhoenixAtYourService",
   "version": "2.0.0",
-  "description": "Alexa Decision Tree template",
+  "description": "Phoenix at your Service Voice hackathon",
   "main": "index.js",
   "dependencies": {
     "ask-sdk-core": "^2.0.0",

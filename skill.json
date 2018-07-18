@@ -3,19 +3,19 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Answer questions to hear a suggested career.",
+          "summary": "Get all your City of Phoenix requests handled through voice.",
           "examplePhrases": [
-            "Alexa open decision tree",
-            "Alexa ask decision tree to start over",
-            "Alexa tell decision tree restart"
+            "Alexa open Phoenix at your service",
+            "Alexa ask Phoenix at your service to start over",
+            "Alexa tell Phoenix at your service restart"
           ],
           "keywords": [
-            "career",
-            "job",
-            "decision"
+            "Phoenix",
+            "services",
+            "city"
           ],
-          "name": "Decision Tree",
-          "description": "Ask Decision Tree for help choosing your ideal career.\n\nAlexa will provide an ideal career by asking a series of questions and giving you an answer.\n\nTo start, just say \"Alexa, launch Decision Tree\" or \"Alexa, open Decision Tree\" to get started\".\n\nAt any time, you can stop by saying \"Alexa, stop\""
+          "name": "Phoenix At Your Service",
+          "description": "Ask Phoenix at your service for help choosing your ideal career.\n\nAlexa will provide an ideal career by asking a series of questions and giving you an answer.\n\nTo start, just say \"Alexa, launch Phoenix at your service\" or \"Alexa, open Phoenix at your service\" to get started\".\n\nAt any time, you can stop by saying \"Alexa, stop\""
         }
       },
       "isAvailableWorldwide": true,

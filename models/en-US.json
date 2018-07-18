@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "decision tree",
+      "invocationName": "phoenix at your service",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -16,324 +16,201 @@
           "samples": []
         },
         {
-          "name": "CouchPotatoIntent",
-          "samples": [
-            "couch potato",
-            "lazy"
-          ]
-        },
-        {
-          "name": "RecommendationIntent",
+          "name": "ContainerIntent",
           "slots": [
             {
-              "name": "salaryImportance",
-              "type": "salaryImportanceType",
+              "name": "container",
+              "type": "containerType",
               "samples": [
-                "{I_Want} to be {salaryImportance}",
-                "{salaryImportance}"
+                "{container}"
               ]
             },
             {
-              "name": "personality",
-              "type": "personalityType",
+              "name": "containerAction",
+              "type": "containerActionType",
               "samples": [
-                "{I_Am} {article} {personality}",
-                "{personality}"
+                "{containerAction}"
               ]
             },
             {
-              "name": "preferredSpecies",
-              "type": "preferredSpeciesType",
+              "name": "containerLocation",
+              "type": "containerLocationType",
               "samples": [
-                "{I_Like} {preferredSpecies}",
-                "{preferredSpecies}"
+                "{containerLocation}"
               ]
-            },
-            {
-              "name": "bloodTolerance",
-              "type": "bloodToleranceType",
-              "samples": [
-                "I would {bloodTolerance}",
-                "{bloodTolerance}"
-              ]
-            },
-            {
-              "name": "I_Like",
-              "type": "iSubjectType"
-            },
-            {
-              "name": "I_Want",
-              "type": "iSubjectType"
-            },
-            {
-              "name": "article",
-              "type": "articleType"
-            },
-            {
-              "name": "I_Am",
-              "type": "IAmType"
             }
           ],
           "samples": [
-            "recommend a job",
-            "{I_Like} {preferredSpecies}",
-            "{I_Like} {bloodTolerance}",
-            "{I_Am} {article} {personality}",
-            "{I_Want} to be {salaryImportance}",
-            "to recommend a job",
-            "start my career"
+            "I want to {containerAction} my {container}",
+            "I want to {containerAction} a new container",
+            "I want to {containerAction} a new {container}",
+            "I want to {containerAction} for my {container}",
+            "I need {containerAction} for my {container}",
+            "I need {containerAction} container",
+            "I need {containerAction} bin",
+            "I need {containerAction} trash",
+            "I want to {containerAction}",
+            "I want to {containerAction} container",
+            "I want to {containerAction} bin",
+            "I want to {containerAction} trash"
           ]
         }
+        
       ],
       "types": [
         {
           "values": [
             {
               "name": {
-                "value": "a",
-                "synonyms": []
+                "value": "trash",
+                "synonyms": [
+                  "green",
+                  "green bin",
+                  "green trash",
+                  "green can",
+                  "trash container",
+                  "trash can",
+                  "trash bin"
+                ]
               }
             },
             {
               "name": {
-                "value": "an",
-                "synonyms": []
+                "value": "recycle",
+                "synonyms": [
+                  "blue",
+                  "blue bin",
+                  "blue trash",
+                  "blue can",
+                  "blue container",
+                  "recycle bin",
+                  "recycle container"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "organic",
+                "synonyms": [
+                  "tan",
+                  "tan bin",
+                  "tan trash",
+                  "tan can",
+                  "tan container",
+                  "organic bin",
+                  "organic container",
+                  "organics bin",
+                  "organics container"
+                ]
               }
             }
           ],
-          "name": "articleType"
+          "name": "containerType"
         },
         {
           "values": [
             {
               "name": {
-                "value": "low",
+                "value": "replace broken",
                 "synonyms": [
-                  "yuck",
-                  "no way",
-                  "gross",
-                  "I can't stand it",
-                  "can't stand it",
-                  "throw up when I see it",
-                  "scream"
+                  "replace damaged",
+                  "green bin"
                 ]
               }
             },
             {
               "name": {
-                "value": "high",
+                "value": "request a new",
                 "synonyms": [
-                  "I like blood",
-                  "doesn't bother me",
-                  "blood is natural",
-                  "shrug"
+                  "a new",
+                  "blue bin",
+                  "blue trash",
+                  "blue can"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "replace missing",
+                "synonyms": [
+                  "replace a missing"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "missed collection",
+                "synonyms": [
+                  "report a missed collection",
+                  "request they get my",
+                  "request they pickup my"
                 ]
               }
             }
           ],
-          "name": "bloodToleranceType"
+          "name": "containerActionType"
         },
         {
           "values": [
             {
               "name": {
-                "value": "I am",
-                "synonyms": []
-              }
-            }
-          ],
-          "name": "IAmType"
-        },
-        {
-          "values": [
-            {
-              "id": "true",
-              "name": {
-                "value": "positive",
+                "value": "alley",
                 "synonyms": [
-                  "I want",
-                  "I prefer",
-                  "I really like",
-                  "I love",
-                  "I like"
-                ]
-              }
-            },
-            {
-              "id": "false",
-              "name": {
-                "value": "negative",
-                "synonyms": [
-                  "I don't want",
-                  "I really don't like",
-                  "I don't like",
-                  "I hate"
-                ]
-              }
-            }
-          ],
-          "name": "iSubjectType"
-        },
-        {
-          "values": [
-            {
-              "name": {
-                "value": "extrovert",
-                "synonyms": [
-                  "social butterfly",
-                  "love to party"
+                  "alley",
+                  "behind my house",
+                  "outback",
+                  "behind house"
                 ]
               }
             },
             {
               "name": {
-                "value": "introvert",
+                "value": "curbside",
                 "synonyms": [
-                  "to be alone",
-                  "misunderstood"
+                  "on the curb",
+                  "curbside",
+                  "street",
+                  "on the street"
                 ]
               }
             }
           ],
-          "name": "personalityType"
-        },
-        {
-          "values": [
-            {
-              "name": {
-                "value": "animals",
-                "synonyms": [
-                  "dogs",
-                  "cats",
-                  "birds",
-                  "turtles",
-                  "puppies",
-                  "kittens",
-                  "elephants"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "people",
-                "synonyms": [
-                  "men",
-                  "women",
-                  "kids",
-                  "humans"
-                ]
-              }
-            }
-          ],
-          "name": "preferredSpeciesType"
-        },
-        {
-          "values": [
-            {
-              "name": {
-                "value": "unimportant",
-                "synonyms": [
-                  "money is evil",
-                  "money is not important",
-                  "not a sell out",
-                  "nope",
-                  "don't care about money"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "somewhat",
-                "synonyms": [
-                  "just enough",
-                  "somewhat important",
-                  "not top priority",
-                  "support my family"
-                ]
-              }
-            },
-            {
-              "name": {
-                "value": "very",
-                "synonyms": [
-                  "high salary",
-                  "filthy rich",
-                  "billionaire",
-                  "important",
-                  "nothing more important"
-                ]
-              }
-            }
-          ],
-          "name": "salaryImportanceType"
+          "name": "containerLocationType"
         }
       ]
     },
     "dialog": {
       "intents": [
         {
-          "name": "RecommendationIntent",
+          "name": "ContainerIntent",
           "confirmationRequired": false,
           "slots": [
             {
-              "name": "salaryImportance",
-              "type": "salaryImportanceType",
-              "elicitationRequired": true,
+              "name": "container",
+              "type": "containerType",
+              "elicitationRequired": false,
               "confirmationRequired": false,
               "prompts": {
-                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-salaryImportance"
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerType"
               }
             },
             {
-              "name": "personality",
-              "type": "personalityType",
-              "elicitationRequired": true,
+              "name": "containerAction",
+              "type": "containerActionType",
+              "elicitationRequired": false,
               "confirmationRequired": false,
               "prompts": {
-                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-personality"
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerAction"
               }
             },
             {
-              "name": "preferredSpecies",
-              "type": "preferredSpeciesType",
-              "elicitationRequired": true,
+              "name": "containerLocation",
+              "type": "containerLocationType",
+              "elicitationRequired": false,
               "confirmationRequired": false,
               "prompts": {
-                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-preferredSpecies"
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerLocation"
               }
-            },
-            {
-              "name": "bloodTolerance",
-              "type": "bloodToleranceType",
-              "elicitationRequired": true,
-              "confirmationRequired": false,
-              "prompts": {
-                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-bloodTolerance"
-              }
-            },
-            {
-              "name": "I_Like",
-              "type": "iSubjectType",
-              "elicitationRequired": false,
-              "confirmationRequired": false
-            },
-            {
-              "name": "I_Want",
-              "type": "iSubjectType",
-              "elicitationRequired": false,
-              "confirmationRequired": false
-            },
-            {
-              "name": "article",
-              "type": "articleType",
-              "elicitationRequired": false,
-              "confirmationRequired": false
-            },
-            {
-              "name": "I_Am",
-              "type": "IAmType",
-              "elicitationRequired": false,
-              "confirmationRequired": false
             }
           ]
         }
@@ -341,38 +218,29 @@
     },
     "prompts": [
       {
-        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-salaryImportance",
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-containerType",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Which phrase best describes your thoughts about money, there's nothing more important, not top priority, or I don't care about money."
+            "value": "What kind of container is it, trash, recycle, or organics?"
           }
         ]
       },
       {
-        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-personality",
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-containerAction",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Would you say that you are an introvert or an extrovert?"
+            "value": "What can we do for you today?"
           }
         ]
       },
       {
-        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-preferredSpecies",
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-containerLocation",
         "variations": [
           {
             "type": "PlainText",
-            "value": "Between animals and people which do you prefer?"
-          }
-        ]
-      },
-      {
-        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-bloodTolerance",
-        "variations": [
-          {
-            "type": "PlainText",
-            "value": "If you saw blood would you scream or shrug?"
+            "value": "Where is your container located at?"
           }
         ]
       }

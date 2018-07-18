@@ -35,32 +35,19 @@ const LaunchRequestHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('Welcome to Decision Tree. I will recommend the best job for you. Do you want to start your career or be a couch potato?')
-      .reprompt('Do you want a career or to be a couch potato?')
+      .speak('Welcome to Phoenix at your Service. I will help you with all your City of Phoenix questions or requests. You can say something like "I need a new recycle container" or "I need to transfer my water services".')
+      .reprompt('You can say something like "I need a new recycle container"')
       .getResponse();
   },
 };
 
-const CouchPotatoIntent = {
-  canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
 
-    return request.type === 'IntentRequest' 
-      && request.intent.name === 'CouchPotatoIntent';
-  },
-  handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak('You don\'t want to start your career? Have fun wasting away on the couch.')
-      .getResponse();
-  },
-};
-
-const InProgressRecommendationIntent = {
+const InProgressContainerIntent = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
     return request.type === 'IntentRequest'
-      && request.intent.name === 'RecommendationIntent'
+      && request.intent.name === 'ContainerIntent'
       && request.dialogState !== 'COMPLETED';
   },
   handle(handlerInput) {
@@ -110,12 +97,12 @@ const InProgressRecommendationIntent = {
   },
 };
 
-const CompletedRecommendationIntent = {
+const CompletedContainerIntent = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
     return request.type === 'IntentRequest'
-      && request.intent.name === 'RecommendationIntent'
+      && request.intent.name === 'ContainerIntent'
       && request.dialogState === 'COMPLETED';
   },
   handle(handlerInput) {
@@ -123,15 +110,9 @@ const CompletedRecommendationIntent = {
 
     const slotValues = getSlotValues(filledSlots);
 
-    const key = `${slotValues.salaryImportance.resolved}-${slotValues.personality.resolved}-${slotValues.bloodTolerance.resolved}-${slotValues.preferredSpecies.resolved}`;
-    const occupation = options[slotsToOptionsMap[key]];
-
-    const speechOutput = `So you want to be ${slotValues.salaryImportance.resolved
-    }. You are an ${slotValues.personality.resolved
-    }, you like ${slotValues.preferredSpecies.resolved
-    }  and you ${slotValues.bloodTolerance.resolved === 'high' ? 'can' : "can't"
-    } tolerate blood ` +
-            `. You should consider being a ${occupation.name}`;
+    const speechOutput = `So you want to ${slotValues.containerAction.resolved} 
+    your ${slotValues.container.resolved}
+    , which is located ${slotValues.containerLocation.resolved}`;
 
     return handlerInput.responseBuilder
       .speak(speechOutput)
@@ -148,8 +129,8 @@ const HelpHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('This is Decision Tree. I can help you find the perfect job. You can say, recommend a job.')
-      .reprompt('Would you like a career or do you want to be a couch potato?')
+      .speak('This is Phoenix at your service, provided by the City of Phoenix. I can help you with all your city of Phoenix requests.')
+      .reprompt('What can Phoenix at your service do for you today? Start or transfer your water services? Request an organics container?')
       .getResponse();
   },
 };
@@ -200,61 +181,9 @@ const ErrorHandler = {
 const skillBuilder = Alexa.SkillBuilders.custom();
 
 const requiredSlots = [
-  'preferredSpecies',
-  'bloodTolerance',
-  'personality',
-  'salaryImportance',
-];
-
-const slotsToOptionsMap = {
-  'unimportant-introvert-low-animals': 20,
-  'unimportant-introvert-low-people': 8,
-  'unimportant-introvert-high-animals': 1,
-  'unimportant-introvert-high-people': 4,
-  'unimportant-extrovert-low-animals': 10,
-  'unimportant-extrovert-low-people': 3,
-  'unimportant-extrovert-high-animals': 11,
-  'unimportant-extrovert-high-people': 13,
-  'somewhat-introvert-low-animals': 20,
-  'somewhat-introvert-low-people': 6,
-  'somewhat-introvert-high-animals': 19,
-  'somewhat-introvert-high-people': 14,
-  'somewhat-extrovert-low-animals': 2,
-  'somewhat-extrovert-low-people': 12,
-  'somewhat-extrovert-high-animals': 17,
-  'somewhat-extrovert-high-people': 16,
-  'very-introvert-low-animals': 9,
-  'very-introvert-low-people': 15,
-  'very-introvert-high-animals': 17,
-  'very-introvert-high-people': 7,
-  'very-extrovert-low-animals': 17,
-  'very-extrovert-low-people': 0,
-  'very-extrovert-high-animals': 1,
-  'very-extrovert-high-people': 5,
-};
-
-const options = [
-  { name: 'Actor', description: '' },
-  { name: 'Animal Control Worker', description: '' },
-  { name: 'Animal Shelter Manager', description: '' },
-  { name: 'Artist', description: '' },
-  { name: 'Court Reporter', description: '' },
-  { name: 'Doctor', description: '' },
-  { name: 'Geoscientist', description: '' },
-  { name: 'Investment Banker', description: '' },
-  { name: 'Lighthouse Keeper', description: '' },
-  { name: 'Marine Ecologist', description: '' },
-  { name: 'Park Naturalist', description: '' },
-  { name: 'Pet Groomer', description: '' },
-  { name: 'Physical Therapist', description: '' },
-  { name: 'Security Guard', description: '' },
-  { name: 'Social Media Engineer', description: '' },
-  { name: 'Software Engineer', description: '' },
-  { name: 'Teacher', description: '' },
-  { name: 'Veterinary', description: '' },
-  { name: 'Veterinary Dentist', description: '' },
-  { name: 'Zookeeper', description: '' },
-  { name: 'Zoologist', description: '' },
+  'container',
+  'containerAction',
+  'containerLocation'
 ];
 
 /* HELPER FUNCTIONS */
@@ -304,9 +233,8 @@ function getSlotValues(filledSlots) {
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
-    CouchPotatoIntent,
-    InProgressRecommendationIntent,
-    CompletedRecommendationIntent,
+    InProgressContainerIntent,
+    CompletedContainerIntent,
     HelpHandler,
     ExitHandler,
     SessionEndedRequestHandler,    
