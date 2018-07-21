@@ -38,10 +38,15 @@
               "samples": [
                 "{containerLocation}"
               ]
+            },
+            {
+              "name": "postalAddress",
+              "type": "AMAZON.PostalAddress"
             }
           ],
           "samples": [
             "I want to {containerAction} my {container}",
+            "I want to {containerAction} {container}",
             "I want to {containerAction} a new container",
             "I want to {containerAction} a new {container}",
             "I want to {containerAction} for my {container}",
@@ -111,10 +116,9 @@
           "values": [
             {
               "name": {
-                "value": "replace broken",
+                "value": "replace a broken",
                 "synonyms": [
-                  "replace damaged",
-                  "green bin"
+                  "replace damaged"
                 ]
               }
             },
@@ -123,17 +127,17 @@
                 "value": "request a new",
                 "synonyms": [
                   "a new",
-                  "blue bin",
-                  "blue trash",
-                  "blue can"
+                  "get a new",
+                  "to get a new",
+                  "request new"
                 ]
               }
             },
             {
               "name": {
-                "value": "replace missing",
+                "value": "replace a missing",
                 "synonyms": [
-                  "replace a missing"
+                  "replace missing"
                 ]
               }
             },
@@ -170,7 +174,11 @@
                   "on the curb",
                   "curbside",
                   "street",
-                  "on the street"
+                  "on the street",
+                  "the street",
+                  "in front of my house",
+                  "in fornt of the house",
+                  "out front"
                 ]
               }
             }
@@ -188,7 +196,7 @@
             {
               "name": "container",
               "type": "containerType",
-              "elicitationRequired": false,
+              "elicitationRequired": true,
               "confirmationRequired": false,
               "prompts": {
                 "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerType"
@@ -197,7 +205,7 @@
             {
               "name": "containerAction",
               "type": "containerActionType",
-              "elicitationRequired": false,
+              "elicitationRequired": true,
               "confirmationRequired": false,
               "prompts": {
                 "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerAction"
@@ -206,10 +214,19 @@
             {
               "name": "containerLocation",
               "type": "containerLocationType",
-              "elicitationRequired": false,
+              "elicitationRequired": true,
               "confirmationRequired": false,
               "prompts": {
                 "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-containerLocation"
+              }
+            },
+            {
+              "name": "postalAddress",
+              "type": "AMAZON.PostalAddress",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-postalAddress"
               }
             }
           ]
@@ -231,7 +248,7 @@
         "variations": [
           {
             "type": "PlainText",
-            "value": "What can we do for you today?"
+            "value": "What can we do for you with regards to your container today, request a new one, report a missing one?"
           }
         ]
       },
@@ -241,6 +258,15 @@
           {
             "type": "PlainText",
             "value": "Where is your container located at?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-postalAddress",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What street address is this for?"
           }
         ]
       }
