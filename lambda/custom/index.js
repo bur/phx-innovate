@@ -55,9 +55,18 @@ const InProgressContainerIntent = {
   canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
 
-    return request.type === 'IntentRequest'
+    return (
+      request.type === 'IntentRequest'
       && request.intent.name === 'ContainerIntent'
-      && request.dialogState !== 'COMPLETED';
+      && request.dialogState !== 'COMPLETED'
+    ) || (
+        request.type === 'IntentRequest'
+        && request.intent.name === 'ContainerIntent'
+        && request.dialogState === 'COMPLETED'
+        && request.intent.slots['postalAddress']
+        && request.intent.slots['postalAddress'].value
+        && hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value) === -1
+      );
   },
   handle(handlerInput) {
     const currentIntent = handlerInput.requestEnvelope.request.intent;
@@ -98,30 +107,7 @@ const InProgressContainerIntent = {
               .reprompt(prompt)
               .addElicitSlotDirective(currentSlot.name)
               .getResponse();
-          } else if (currentSlot.name === 'postalAddress' &&
-            hardcodedPostalAddress.indexOf(currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name) === -1
-          ) {
-            if (currentSlot.resolutions &&
-              currentSlot.resolutions.resolutionsPerAuthority[0] &&
-              hardcodedPostalAddress.indexOf(currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name) === -1) {
-              /**
-           * hardcodedPostalAddress should be a service call to City of Phoenix to get the list of addresses registered with the accountId.
-           */
-              prompt = `The resolved address at ${currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name} is not one of your addresses linked to your accounts. Please use one of the following: `
-            } else {
-              prompt = `Which street address is this for, please? `
-            }
-
-            hardcodedPostalAddress.forEach((element, index) => {
-              prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element.value.name}`;
-            });
-
-            return handlerInput.responseBuilder
-              .speak(prompt)
-              .reprompt(prompt)
-              .addElicitSlotDirective(currentSlot.name)
-              .getResponse();
-          }
+          } 
         } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_NO_MATCH') {
           if (requiredSlots.indexOf(currentSlot.name) > -1) {
             prompt = `What ${currentSlot.name} are you looking for`;
@@ -133,6 +119,28 @@ const InProgressContainerIntent = {
               .getResponse();
           }
         }
+      } else if (currentSlot.name === 'postalAddress' &&
+        hardcodedPostalAddress.indexOf(currentSlot.value) === -1
+      ) {
+        if (currentSlot.value) {
+          /**
+           * hardcodedPostalAddress should be a service call to City of Phoenix to get the list of addresses registered with the accountId.
+           * */
+          prompt = `The resolved address at ${currentSlot.value} is not one of your addresses linked to your accounts. Please use one of the following: `
+        } else {
+          prompt = `Which street address is this for, please? `
+        }
+
+        const size = hardcodedPostalAddress.length;
+        hardcodedPostalAddress.forEach((element, index) => {
+          prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element}`;
+        });
+
+        return handlerInput.responseBuilder
+          .speak(prompt)
+          .reprompt(prompt)
+          .addElicitSlotDirective(currentSlot.name)
+          .getResponse();
       }
     }
 
@@ -148,16 +156,15 @@ const CompletedContainerIntent = {
 
     return request.type === 'IntentRequest'
       && request.intent.name === 'ContainerIntent'
-      && request.dialogState === 'COMPLETED';
+      && request.dialogState === 'COMPLETED'
+      && hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value) !== -1
   },
   handle(handlerInput) {
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
 
     const slotValues = getSlotValues(filledSlots);
 
-    var speechOutput = `So you want to ${slotValues.containerAction.resolved} 
-    your ${slotValues.container.resolved}
-    , which is located ${slotValues.containerLocation.resolved} for user ${handlerInput.requestEnvelope.session.user.userId}.`;
+    var speechOutput = `So you want to ${slotValues.containerAction.resolved} your ${slotValues.container.resolved}, which is located ${slotValues.containerLocation.resolved}.`;
 
     /**
      * Here would be the POST request to City of Phoenix system to submit the request. It would 
@@ -170,20 +177,18 @@ const CompletedContainerIntent = {
     putPhxTicketWithAmazonId(randomPhxId, handlerInput.requestEnvelope.session.user.userId).then(
       function (data) {
         speechOutput += ` Your confirmation number is ${randomPhxId}`;
+
+        return handlerInput.responseBuilder
+          .speak(`Test this.`)
+          .getResponse();
+      }, function (err) {
+        speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
         console.log(handlerInput.responseBuilder
           .speak(speechOutput)
           .getResponse())
         return handlerInput.responseBuilder
           .speak(speechOutput)
           .getResponse();
-      }, function(err) {
-        speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
-        console.log(handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse())
-      return handlerInput.responseBuilder
-        .speak(speechOutput)
-        .getResponse();  
       }
     ).catch(function (e) {
       speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
@@ -194,7 +199,6 @@ const CompletedContainerIntent = {
         .speak(speechOutput)
         .getResponse();
     })
-    console.log("here we go again.")
 
   }
 };
@@ -241,8 +245,8 @@ const SessionEndedRequestHandler = {
 };
 
 const hardcodedPostalAddress = [
-  "1234 North Fake Lane",
-  "5678 South Fake Street"
+  "1234 north fake lane",
+  "5678 south fake street"
 ]
 
 const ErrorHandler = {
@@ -319,6 +323,7 @@ function putPhxTicketWithAmazonId(phxTicketId, amazonId) {
     Item: {
       'PHX_TICKET_ID': { S: phxTicketId },
       'AMAZON_USER_ID': { S: amazonId },
+      'STATUS': { S: 'PENDING' }
     }
   };
 
