@@ -59,8 +59,46 @@
             "I want to {containerAction} bin",
             "I want to {containerAction} trash"
           ]
+        },
+        {
+          "name": "WaterServicesIntent",
+          "slots": [
+            {
+              "name": "waterServicesAction",
+              "type": "waterServicesActionType",
+              "samples": [
+                "{waterServicesAction}"
+              ]
+            },
+            {
+              "name": "property",
+              "type": "propertyType",
+              "samples": [
+                "{property}"
+              ]
+            },
+            {
+              "name": "mainDate",
+              "type": "AMAZON.DATE"
+            },
+            {
+              "name": "transferStartDate",
+              "type": "AMAZON.DATE"
+            },
+            {
+              "name": "postalAddress",
+              "type": "AMAZON.PostalAddress"
+            }
+          ],
+          "samples": [
+            "I want to {waterServicesAction} at my {propertyType}",
+            "I want to {waterServicesAction} on {mainDate}",
+            "I need to {waterServicesAction} on {transferStartDate}",
+            "Help me {waterServicesAction}"
+            "I'm moving on {stopDate} and need to {waterServicesAction}"
+          ]
         }
-        
+
       ],
       "types": [
         {
@@ -184,6 +222,62 @@
             }
           ],
           "name": "containerLocationType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "start services",
+                "synonyms": [
+                  "begin services",
+                  "set up new water services",
+                  "create new service"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "stop services",
+                "synonyms": [
+                  "cancel services",
+                  "end water service"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "transfer services",
+                "synonyms": [
+                  "move services",
+                  "change water service location"
+                ]
+              }
+            }
+          ],
+          "name": "waterServicesActionType"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "residential",
+                "synonyms": [
+                  "home",
+                  "personal"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "commercial",
+                "synonyms": [
+                  "business property",
+                  "organization"
+                ]
+              }
+            }
+          ],
+          "name": "propertyType"
         }
       ]
     },
@@ -230,6 +324,57 @@
               }
             }
           ]
+        },
+        {
+          "name": "WaterServicesIntent",
+          "confirmationRequired": false,
+          "slots": [
+            {
+              "name": "waterServicesAction",
+              "type": "waterServicesActionType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-waterServicesAction"
+              }
+            },
+            {
+              "name": "property",
+              "type": "propertyType",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-property"
+              }
+            },
+            {
+              "name": "mainDate",
+              "type": "AMAZON.DATE",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-startDate"
+              }
+            },
+            {
+              "name": "transferStartDate",
+              "type": "AMAZON.DATE",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-stopDate"
+              }
+            },
+            {
+              "name": "postalAddress",
+              "type": "AMAZON.PostalAddress",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-postalAddress"
+              }
+            }
+          ]
         }
       ]
     },
@@ -258,6 +403,42 @@
           {
             "type": "PlainText",
             "value": "Where is your container located at?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-waterServicesAction",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Would you like to start, stop, or transfer your water services?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-property",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Will this service request be for a residential or commercial location?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-mainDate",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What date should this request be made effective for?"
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Intent-RecommendationIntent.IntentSlot-transferStartDate",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What date will you be needing the services at the new location to be effective?"
           }
         ]
       },

@@ -30,7 +30,7 @@ const Alexa = require('ask-sdk-core');
 const AWS = require('aws-sdk');
 
 
-// Set the region 
+// Set the region
 AWS.config.update({ region: 'us-west-2' });
 
 // Create the DynamoDB service object
@@ -70,7 +70,7 @@ const InProgressContainerIntent = {
         && currentSlot.resolutions.resolutionsPerAuthority[0]) {
         if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_MATCH') {
           /**
-           * If multiple resolutions are found, request the user to specify between the 
+           * If multiple resolutions are found, request the user to specify between the
            * matched results.
            */
           if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
@@ -82,7 +82,7 @@ const InProgressContainerIntent = {
                 prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element.value.name}`;
                 /**
                  * If 'containerAction', should say something like...
-                 * 'Which would you like to do, replace a broken container or replace a 
+                 * 'Which would you like to do, replace a broken container or replace a
                  * missing contrainer'
                  */
                 if (currentSlot.name === 'containerAction') {
@@ -155,12 +155,12 @@ const CompletedContainerIntent = {
 
     const slotValues = getSlotValues(filledSlots);
 
-    var speechOutput = `So you want to ${slotValues.containerAction.resolved} 
+    var speechOutput = `So you want to ${slotValues.containerAction.resolved}
     your ${slotValues.container.resolved}
     , which is located ${slotValues.containerLocation.resolved} for user ${handlerInput.requestEnvelope.session.user.userId}.`;
 
     /**
-     * Here would be the POST request to City of Phoenix system to submit the request. It would 
+     * Here would be the POST request to City of Phoenix system to submit the request. It would
      * return an identifier to refer back to.
      */
 
@@ -183,7 +183,7 @@ const CompletedContainerIntent = {
           .getResponse())
       return handlerInput.responseBuilder
         .speak(speechOutput)
-        .getResponse();  
+        .getResponse();
       }
     ).catch(function (e) {
       speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
@@ -195,6 +195,168 @@ const CompletedContainerIntent = {
         .getResponse();
     })
     console.log("here we go again.")
+
+  }
+};
+
+const InProgressWaterServicesIntent = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return (request.type === 'IntentRequest'
+      && request.intent.name === 'WaterServicesIntent'
+      && request.dialogState !== 'COMPLETED';
+    ) || (
+      request.type === 'IntentRequest'
+      && request.intent.name === 'ContainerIntent'
+      && request.dialogState === 'COMPLETED'
+      && request.intent.slots['postalAddress']
+      && request.intent.slots['postalAddress'].value
+      && hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value) === -1
+    ) || (
+      request.type === 'IntentRequest'
+      && request.intent.name === 'ContainerIntent'
+      && request.dialogState === 'COMPLETED'
+      && request.intent.slots['waterServicesAction'].value === 'transfer services'
+      && request.intent.slots['transferStartDate'].value === null
+    )
+  },
+  handle(handlerInput) {
+    const currentIntent = handlerInput.requestEnvelope.request.intent;
+    let prompt = '';
+
+    for (const slotName of Object.keys(handlerInput.requestEnvelope.request.intent.slots)) {
+      const currentSlot = currentIntent.slots[slotName];
+      if (currentSlot.confirmationStatus !== 'CONFIRMED'
+        && currentSlot.resolutions
+        && currentSlot.resolutions.resolutionsPerAuthority[0]) {
+        if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_MATCH') {
+          /**
+           * If multiple resolutions are found, request the user to specify between the
+           * matched results.
+           */
+          if (currentSlot.resolutions.resolutionsPerAuthority[0].values.length > 1) {
+            prompt = 'Which would you like to do,';
+            const size = currentSlot.resolutions.resolutionsPerAuthority[0].values.length;
+
+            currentSlot.resolutions.resolutionsPerAuthority[0].values
+              .forEach((element, index) => {
+                prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element.value.name}`;
+                /**
+                 * If 'containerAction', should say something like...
+                 * 'Which would you like to do, replace a broken container or replace a
+                 * missing contrainer'
+                 */
+                // if (currentSlot.name === 'containerAction') {
+                //   prompt += ` container`
+                // }
+
+              });
+
+            prompt += '?';
+
+            return handlerInput.responseBuilder
+              .speak(prompt)
+              .reprompt(prompt)
+              .addElicitSlotDirective(currentSlot.name)
+              .getResponse();
+          }
+        } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_NO_MATCH') {
+          if (requiredSlots.indexOf(currentSlot.name) > -1) {
+            prompt = `What ${currentSlot.name} are you looking for`;
+
+            return handlerInput.responseBuilder
+              .speak(prompt)
+              .reprompt(prompt)
+              .addElicitSlotDirective(currentSlot.name)
+              .getResponse();
+          }
+        }
+      } else if (currentSlot.name === 'postalAddress' &&
+        hardcodedPostalAddress.indexOf(currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name) === -1
+      ) {
+        if (currentSlot.resolutions &&
+          currentSlot.resolutions.resolutionsPerAuthority[0] &&
+          hardcodedPostalAddress.indexOf(currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name) === -1) {
+          /**
+       * hardcodedPostalAddress should be a service call to City of Phoenix to get the list of addresses registered with the accountId.
+       */
+          prompt = `The resolved address at ${currentSlot.resolutions.resolutionsPerAuthority[0].values[0].value.name} is not one of your addresses linked to your accounts. Please use one of the following: `
+        } else {
+          prompt = `Which street address is this for, please? `
+        }
+
+        const size = hardcodedPostalAddress.length;
+        hardcodedPostalAddress.forEach((element, index) => {
+          prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element.value.name}`;
+        });
+
+        return handlerInput.responseBuilder
+          .speak(prompt)
+          .reprompt(prompt)
+          .addElicitSlotDirective(currentSlot.name)
+          .getResponse();
+      }
+    }
+
+    return handlerInput.responseBuilder
+      .addDelegateDirective(currentIntent)
+      .getResponse();
+  },
+};
+
+const CompletedWaterServicesIntent = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest'
+      && request.intent.name === 'WaterServicesIntent'
+      && request.dialogState === 'COMPLETED'
+      && hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value) !== -1
+  },
+  handle(handlerInput) {
+    const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
+
+    const slotValues = getSlotValues(filledSlots);
+
+    var speechOutput = `So you want to ${slotValues.waterServicesAction.resolved} at your ${slotValues.property.resolved} location
+    , which is located at ${slotValues.postalAddress.resolved}, on ${slotValues.startDate.resolved} for user ${handlerInput.requestEnvelope.session.user.userId}.`;
+
+    /**
+     * Here would be the POST request to City of Phoenix system to submit the request. It would
+     * return an identifier to refer back to.
+     */
+
+    // Random number from 100,000 to 999,999
+    var randomPhxId = (Math.floor(Math.random() * 899999) + 100000).toString();
+
+    putPhxTicketWithAmazonId(randomPhxId, handlerInput.requestEnvelope.session.user.userId).then(
+      function (data) {
+        speechOutput += ` Your confirmation number is ${randomPhxId}`;
+        console.log(handlerInput.responseBuilder
+          .speak(speechOutput)
+          .getResponse())
+        return handlerInput.responseBuilder
+          .speak(speechOutput)
+          .getResponse();
+      }, function(err) {
+        speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
+        console.log(handlerInput.responseBuilder
+          .speak(speechOutput)
+          .getResponse())
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .getResponse();
+      }
+    ).catch(function (e) {
+      speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
+      console.log(handlerInput.responseBuilder
+        .speak(speechOutput)
+        .getResponse())
+      return handlerInput.responseBuilder
+        .speak(speechOutput)
+        .getResponse();
+    })
 
   }
 };
@@ -341,6 +503,8 @@ exports.handler = skillBuilder
     LaunchRequestHandler,
     InProgressContainerIntent,
     CompletedContainerIntent,
+    InProgressWaterServicesIntent,
+    CompletedWaterServicesIntent,
     HelpHandler,
     ExitHandler,
     SessionEndedRequestHandler)
