@@ -47,3 +47,5 @@ Temporary Items
 .apdisk
 
 lambda/custom/node_modules/**
+lambda/custom/node_modules
+lambda/custom/package-lock.json
