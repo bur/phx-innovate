@@ -107,7 +107,7 @@ const InProgressContainerIntent = {
               .reprompt(prompt)
               .addElicitSlotDirective(currentSlot.name)
               .getResponse();
-          } 
+          }
         } else if (currentSlot.resolutions.resolutionsPerAuthority[0].status.code === 'ER_SUCCESS_NO_MATCH') {
           if (requiredSlots.indexOf(currentSlot.name) > -1) {
             prompt = `What ${currentSlot.name} are you looking for`;
@@ -126,15 +126,16 @@ const InProgressContainerIntent = {
           /**
            * hardcodedPostalAddress should be a service call to City of Phoenix to get the list of addresses registered with the accountId.
            * */
-          prompt = `The resolved address at ${currentSlot.value} is not one of your addresses linked to your accounts. Please use one of the following: `
+          prompt = `The resolved address at ${currentSlot.value} is not one of your addresses linked to your accounts. Please use one of the following:`
+          const size = hardcodedPostalAddress.length;
+          hardcodedPostalAddress.forEach((element, index) => {
+            prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element}`;
+          });
         } else {
           prompt = `Which street address is this for, please? `
         }
 
-        const size = hardcodedPostalAddress.length;
-        hardcodedPostalAddress.forEach((element, index) => {
-          prompt += ` ${(index === size - 1) ? ' or' : ' '} ${element}`;
-        });
+
 
         return handlerInput.responseBuilder
           .speak(prompt)
@@ -164,7 +165,7 @@ const CompletedContainerIntent = {
 
     const slotValues = getSlotValues(filledSlots);
 
-    var speechOutput = `So you want to ${slotValues.containerAction.resolved} your ${slotValues.container.resolved}, which is located ${slotValues.containerLocation.resolved}.`;
+    var speechOutput = `So you want to ${slotValues.containerAction.resolved} ${slotValues.container.resolved}, which is located ${slotValues.containerLocation.resolved} at the address ${slotValues.postalAddress.resolved}.`;
 
     /**
      * Here would be the POST request to City of Phoenix system to submit the request. It would 
@@ -174,18 +175,18 @@ const CompletedContainerIntent = {
     // Random number from 100,000 to 999,999
     var randomPhxId = (Math.floor(Math.random() * 899999) + 100000).toString();
 
-    putPhxTicketWithAmazonId(randomPhxId, handlerInput.requestEnvelope.session.user.userId).then(
+    putPhxTicketWithAmazonId(
+      randomPhxId, 
+      handlerInput.requestEnvelope.session.user.userId, 
+      `${slotValues.containerAction.resolved} ${slotValues.container.resolved} at the address ${slotValues.postalAddress.resolved}`
+    ).then(
       function (data) {
         speechOutput += ` Your confirmation number is ${randomPhxId}`;
-
         return handlerInput.responseBuilder
-          .speak(`Test this.`)
+          .speak(speechOutput)
           .getResponse();
       }, function (err) {
         speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
-        console.log(handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse())
         return handlerInput.responseBuilder
           .speak(speechOutput)
           .getResponse();
@@ -200,6 +201,10 @@ const CompletedContainerIntent = {
         .getResponse();
     })
 
+    speechOutput += ` Your confirmation number is ${randomPhxId}`;
+    return handlerInput.responseBuilder
+      .speak(speechOutput)
+      .getResponse();
   }
 };
 
@@ -228,7 +233,7 @@ const ExitHandler = {
   },
   handle(handlerInput) {
     return handlerInput.responseBuilder
-      .speak('Bye')
+      .speak('Have a great day.')
       .getResponse();
   },
 };
@@ -277,8 +282,6 @@ const requiredSlots = [
 
 function getSlotValues(filledSlots) {
   const slotValues = {};
-
-  console.log(`The filled slots: ${JSON.stringify(filledSlots)}`);
   Object.keys(filledSlots).forEach((item) => {
     const name = filledSlots[item].name;
 
@@ -317,13 +320,14 @@ function getSlotValues(filledSlots) {
   return slotValues;
 }
 
-function putPhxTicketWithAmazonId(phxTicketId, amazonId) {
+function putPhxTicketWithAmazonId(phxTicketId, amazonId, message) {
   var params = {
     TableName: 'phx-at-your-service',
     Item: {
       'PHX_TICKET_ID': { S: phxTicketId },
       'AMAZON_USER_ID': { S: amazonId },
-      'STATUS': { S: 'PENDING' }
+      'STATUS': { S: 'PENDING' },
+      'TICKET_MESSAGE': { S: message},
     }
   };
 
