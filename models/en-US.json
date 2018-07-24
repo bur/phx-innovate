@@ -57,7 +57,11 @@
             "I want to {containerAction}",
             "I want to {containerAction} container",
             "I want to {containerAction} bin",
-            "I want to {containerAction} trash"
+            "I want to {containerAction} trash",
+            "{containerAction}",
+            "{containerAction} trash",
+            "{containerAction} bin",
+            "{containerAction} container"
           ]
         },
         {
@@ -95,7 +99,10 @@
             "I want to {waterTrashServicesAction} on {mainDate}",
             "I need to {waterTrashServicesAction} on {transferStartDate}",
             "Help me {waterTrashServicesAction}",
-            "I'm moving on {mainDate} and need to {waterTrashServicesAction}"
+            "I'm moving on {mainDate} and need to {waterTrashServicesAction}",
+            "{waterTrashServicesAction}",
+            "I want to {waterTrashServicesAction}",
+            "I need to {waterTrashServicesAction}"
           ]
         }
 
@@ -231,7 +238,8 @@
                 "synonyms": [
                   "begin services",
                   "set up new water services",
-                  "create new service"
+                  "create new service",
+                  "start my water service"
                 ]
               }
             },
@@ -249,7 +257,9 @@
                 "value": "transfer services",
                 "synonyms": [
                   "move services",
-                  "change water service location"
+                  "change water service location",
+                  "transfer my water services",
+                  "transfer my services"
                 ]
               }
             }
