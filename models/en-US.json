@@ -16,6 +16,25 @@
           "samples": []
         },
         {
+          "name": "TicketStatusIntent",
+          "slots": [
+            {
+              "name": "yesNo",
+              "type": "yesNoType",
+              "samples": [
+                "{yesNo}"
+              ]
+            }
+          ],
+          "samples": [
+            "I want to get the status of my ticket",
+            "Tell me what my open tickets are",
+            "I want to know my open tickets",
+            "Open tickets",
+            "Tell my my open tickets"
+          ]
+        },
+        {
           "name": "ContainerIntent",
           "slots": [
             {
@@ -108,6 +127,35 @@
 
       ],
       "types": [
+        {
+          "name": "yesNoType",
+          "values": [
+            {
+              "id": "TRUE",
+              "name": {
+                "value": "yes",
+                "synonyms": [
+                  "yep",
+                  "yeah",
+                  "I do",
+                  "yes please",
+                  "you know it"
+                ]
+              }
+            },
+            {
+              "id": "FALSE",
+              "name": {
+                "value": "no",
+                "synonyms": [
+                  "nope",
+                  "I do not",
+                  "no thank you"
+                ]
+              }
+            }
+          ]
+        },
         {
           "values": [
             {
@@ -382,6 +430,21 @@
               "confirmationRequired": false,
               "prompts": {
                 "elicitation": "Elicit.Intent-RecommendationIntent.IntentSlot-postalAddress"
+              }
+            }
+          ]
+        },
+        {
+          "name": "TicketStatusIntent",
+          "confirmationRequired": false,
+          "slots": [
+            {
+              "name": "yesNo",
+              "type": "yesNoType",
+              "elicitationRequired": false,
+              "confirmationRequired": false,
+              "prompts": {
+                
               }
             }
           ]

@@ -193,9 +193,7 @@ const CompletedContainerIntent = {
       }
     ).catch(function (e) {
       speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
-      console.log(handlerInput.responseBuilder
-        .speak(speechOutput)
-        .getResponse())
+
       return handlerInput.responseBuilder
         .speak(speechOutput)
         .getResponse();
@@ -210,7 +208,7 @@ const CompletedContainerIntent = {
 
 const InProgressWaterTrashServicesIntent = {
   canHandle(handlerInput) {
-    console.log('here5');
+
     const request = handlerInput.requestEnvelope.request;
 
     if (request.type === 'IntentRequest' && request.intent.name === 'WaterTrashServicesIntent') {
@@ -240,7 +238,7 @@ const InProgressWaterTrashServicesIntent = {
     return false;
   },
   handle(handlerInput) {
-    console.log('here4');
+
     const currentIntent = handlerInput.requestEnvelope.request.intent;
     let prompt = '';
     let isTransfer = false;
@@ -317,13 +315,13 @@ const InProgressWaterTrashServicesIntent = {
 
     if (isTransfer && !currentIntent.slots['transferStartDate'].value) {
       return handlerInput.responseBuilder
-          .speak('Please enter the start date of the service transfer')
-          .reprompt('Please enter the start date of the service transfer')
-          .addElicitSlotDirective('transferStartDate')
-          .getResponse();
+        .speak('Please enter the start date of the service transfer')
+        .reprompt('Please enter the start date of the service transfer')
+        .addElicitSlotDirective('transferStartDate')
+        .getResponse();
     }
 
-    console.log('here3');
+
     return handlerInput.responseBuilder
       .addDelegateDirective(currentIntent)
       .getResponse();
@@ -332,34 +330,33 @@ const InProgressWaterTrashServicesIntent = {
 
 const CompletedWaterTrashServicesIntent = {
   canHandle(handlerInput) {
-    console.log('here2');
+
     const request = handlerInput.requestEnvelope.request;
     if (request.type === 'IntentRequest'
-    && request.intent.name === 'WaterTrashServicesIntent'
-    && request.dialogState === 'COMPLETED') {
+      && request.intent.name === 'WaterTrashServicesIntent'
+      && request.dialogState === 'COMPLETED') {
       if (hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value.toLowerCase()) !== -1
-      && request.intent.slots['waterTrashServicesAction'].resolutions
-      && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values
-      && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values[0].value.name !== 'transfer services') {
+        && request.intent.slots['waterTrashServicesAction'].resolutions
+        && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values
+        && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values[0].value.name !== 'transfer services') {
         return true;
       } else if (hardcodedPostalAddress.indexOf(request.intent.slots['postalAddress'].value.toLowerCase()) !== -1
-      && request.intent.slots['waterTrashServicesAction'].resolutions
-      && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values
-      && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values[0].value.name === 'transfer services'
-      && request.intent.slots['transferStartDate'].value !== null) {
+        && request.intent.slots['waterTrashServicesAction'].resolutions
+        && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values
+        && request.intent.slots['waterTrashServicesAction'].resolutions.resolutionsPerAuthority[0].values[0].value.name === 'transfer services'
+        && request.intent.slots['transferStartDate'].value !== null) {
         return true;
       }
-    } 
+    }
 
     return false;
   },
-  handle(handlerInput) {
-    console.log('here1');
+  async handle(handlerInput) {
     const filledSlots = handlerInput.requestEnvelope.request.intent.slots;
 
     const slotValues = getSlotValues(filledSlots);
 
-    console.log(JSON.stringify(slotValues));
+
     var speechOutput = `${slotValues.waterTrashServicesAction.resolved} at your ${slotValues.property.resolved} location
     , which is located at ${slotValues.postalAddress.resolved}`;
 
@@ -381,28 +378,21 @@ const CompletedWaterTrashServicesIntent = {
       randomPhxId,
       handlerInput.requestEnvelope.session.user.userId,
       speechOutput).then(
-      function (data) {
-        speechOutput += ` Your confirmation number is ${randomPhxId}`;
-        console.log(handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse())
-        return handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse();
-      }, function (err) {
-        speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
-        console.log(handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse())
-        return handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse();
-      }
+        function (data) {
+          speechOutput += ` Your confirmation number is ${randomPhxId}`;
+          return handlerInput.responseBuilder
+            .speak(speechOutput)
+            .getResponse();
+        }, function (err) {
+          speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
+
+          return handlerInput.responseBuilder
+            .speak(speechOutput)
+            .getResponse();
+        }
       ).catch(function (e) {
         speechOutput = ` Your request could not be submitted, please call 123-456-7890`;
-        console.log(handlerInput.responseBuilder
-          .speak(speechOutput)
-          .getResponse())
+
         return handlerInput.responseBuilder
           .speak(speechOutput)
           .getResponse();
@@ -411,6 +401,70 @@ const CompletedWaterTrashServicesIntent = {
     speechOutput = 'So you want to ' + speechOutput + ` Your confirmation number is ${randomPhxId}`;
     return handlerInput.responseBuilder
       .speak(speechOutput)
+      .getResponse();
+
+  }
+};
+
+const StartedTicketStatusIntent = {
+  canHandle(handlerInput) {
+
+    const request = handlerInput.requestEnvelope.request;
+    if (request.type === 'IntentRequest'
+      && request.intent.name === 'TicketStatusIntent'
+      && request.dialogState === 'STARTED') {
+      return true;
+    }
+
+    return false;
+  },
+  async handle(handlerInput) {
+
+    getPhxTicketWithAmazonId(handlerInput.requestEnvelope.session.user.userId).then(
+      function (data) {
+        console.log(JSON.stringify(data));
+        return handlerInput.responseBuilder
+          .speak('data 1')
+          .getResponse();
+      }, function (err) {
+        console.log(JSON.stringify(err));
+        return handlerInput.responseBuilder
+          .speak('data 2')
+          .getResponse();
+      }
+    ).catch(function (e) {
+      console.log(JSON.stringify(e));
+      return handlerInput.responseBuilder
+        .speak('data 3')
+        .getResponse();
+    });
+    return handlerInput.responseBuilder
+      .speak('You have 10 tickets open, would you like to hear them?')
+      .reprompt('You have 10 tickets open, would you like to hear them?')
+      .addElicitSlotDirective('yesNo')
+      .getResponse();
+
+  }
+};
+
+const CompletedTicketStatusIntent = {
+  canHandle(handlerInput) {
+
+    const request = handlerInput.requestEnvelope.request;
+    if (request.type === 'IntentRequest'
+      && request.intent.name === 'TicketStatusIntent'
+      && request.dialogState === 'COMPLETED') {
+      return true;
+    }
+
+    return false;
+  },
+  handle(handlerInput) {
+
+    return handlerInput.responseBuilder
+      .speak('You have 10 tickets open, would you like to hear them?')
+      .reprompt('You have 10 tickets open, would you like to hear them?')
+      .addElicitSlotDirective('yesNo')
       .getResponse();
 
   }
@@ -553,6 +607,28 @@ function putPhxTicketWithAmazonId(phxTicketId, amazonId, message) {
   })
 }
 
+function getPhxTicketWithAmazonId(amazonId) {
+  var params = {
+    Key: {
+      "AMAZON_USER_ID": {
+        S: amazonId
+      }
+    },
+    TableName: 'phx-at-your-service',
+  };
+  return new Promise(function (resolve, reject) {
+    dynamodb.getItem(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+        reject(err);
+      } else {
+        console.log(data);
+        resolve(data);
+      };
+    });
+  });
+}
+
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
@@ -560,8 +636,10 @@ exports.handler = skillBuilder
     CompletedContainerIntent,
     InProgressWaterTrashServicesIntent,
     CompletedWaterTrashServicesIntent,
+    StartedTicketStatusIntent,
     HelpHandler,
     ExitHandler,
-    SessionEndedRequestHandler)
+    SessionEndedRequestHandler,
+    CompletedTicketStatusIntent)
   .addErrorHandlers(ErrorHandler)
   .lambda();
