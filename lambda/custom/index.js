@@ -420,29 +420,22 @@ const StartedTicketStatusIntent = {
   },
   async handle(handlerInput) {
 
-    getPhxTicketWithAmazonId(handlerInput.requestEnvelope.session.user.userId).then(
-      function (data) {
-        console.log(JSON.stringify(data));
-        return handlerInput.responseBuilder
-          .speak('data 1')
-          .getResponse();
-      }, function (err) {
-        console.log(JSON.stringify(err));
-        return handlerInput.responseBuilder
-          .speak('data 2')
-          .getResponse();
-      }
-    ).catch(function (e) {
-      console.log(JSON.stringify(e));
+    try {
+      data = await getPhxTicketWithAmazonId(handlerInput.requestEnvelope.session.user.userId);
+    }
+    catch (err) {
+      console.log(JSON.stringify(err));
       return handlerInput.responseBuilder
         .speak('data 3')
         .getResponse();
-    });
+    }
+    console.log(JSON.stringify(data));
     return handlerInput.responseBuilder
       .speak('You have 10 tickets open, would you like to hear them?')
       .reprompt('You have 10 tickets open, would you like to hear them?')
       .addElicitSlotDirective('yesNo')
       .getResponse();
+
 
   }
 };
@@ -607,26 +600,16 @@ function putPhxTicketWithAmazonId(phxTicketId, amazonId, message) {
   })
 }
 
-function getPhxTicketWithAmazonId(amazonId) {
+async function getPhxTicketWithAmazonId(amazonId) {
   var params = {
-    Key: {
-      "AMAZON_USER_ID": {
-        S: amazonId
-      }
+    IndexName : 'AMAZON_USER_ID-index',
+    KeyConditionExpression : 'AMAZON_USER_ID = :amazonVal', 
+    ExpressionAttributeValues : {
+      'amazonVal' : amazonId        
     },
     TableName: 'phx-at-your-service',
   };
-  return new Promise(function (resolve, reject) {
-    dynamodb.getItem(params, function (err, data) {
-      if (err) {
-        console.log(err, err.stack);
-        reject(err);
-      } else {
-        console.log(data);
-        resolve(data);
-      };
-    });
-  });
+  return ddb.getItem(params).promise();
 }
 
 exports.handler = skillBuilder
@@ -643,3 +626,24 @@ exports.handler = skillBuilder
     CompletedTicketStatusIntent)
   .addErrorHandlers(ErrorHandler)
   .lambda();
+
+  // //Uncomment to test by running: node index.html
+  // async function test() {
+  //   try {
+  //     var data = await getPhxTicketWithAmazonId('amzn1.ask.account.AEM2ESLOUBDTFFU2AFBEEZVABEOB7FD5QZJKARZXTU6GSYSATBXF6JHGKKVF7LM2UUVN2OYBSLCGGDSTEJ6A3N3VR6TJ46G44SAEK3GWDKEICOE33A37A3KG24JIAHYX5A7ZRDWAU4HSIKB2BF5P5OYQZPLLPH3PMBLRJ7UJFXLPBGBSIK6SA2KGGVH7PJLZUYOW6MWV4KIE74A');
+  //     console.log('here1')
+  //   }
+  //   catch (err) {
+  //     console.log('here2')
+  //     console.log(JSON.stringify(err));
+  //     console.log(err);
+  
+  //   }
+  //   console.log('here3')
+  //   console.log(JSON.stringify(data));
+  // }
+
+  // test();
+
+
+
